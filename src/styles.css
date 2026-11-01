@@ -4,11 +4,30 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 body {
   @apply bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
+}
+
+/* Grid lines on a fixed layer, faded toward the edges so content stays the focus */
+body::before {
+  --grid-line: var(--color-zinc-200);
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+.dark body::before {
+  --grid-line: var(--color-zinc-800);
 }
 
 .marquee {
@@ -23,8 +42,61 @@ body {
   animation-play-state: paused;
 }
 
+.cursor {
+  animation: blink 1s steps(1) infinite;
+}
+
+/* Same gradient as the title cursor, fading in and drifting on hover */
+.btn-glow {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.btn-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    110deg,
+    var(--color-sky-400),
+    var(--color-violet-500),
+    var(--color-fuchsia-500),
+    var(--color-sky-400)
+  );
+  background-size: 300% 100%;
+  opacity: 0;
+  transition: opacity 0.3s;
+  animation: drift 3s linear infinite;
+}
+
+.btn-glow:hover,
+.btn-glow:focus-visible {
+  box-shadow: 0 8px 24px -6px var(--color-violet-500);
+}
+
+.btn-glow:hover::before,
+.btn-glow:focus-visible::before {
+  opacity: 1;
+}
+
+@keyframes drift {
+  to {
+    background-position: 300% 0;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track {
+  .marquee-track,
+  .cursor,
+  .btn-glow::before {
     animation: none;
   }
 }
